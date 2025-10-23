@@ -10,7 +10,19 @@
       --bg: #f8f9fa;
       --bot: #e9ecef;
       --text-dark: #212529;
+      --border: #ddd;
+      --shadow: rgba(0,0,0,0.1);
     }
+
+    body.dark {
+      --primary: #0d6efd;
+      --bg: #121212;
+      --bot: #1f1f1f;
+      --text-dark: #f8f9fa;
+      --border: #333;
+      --shadow: rgba(255,255,255,0.05);
+    }
+
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
@@ -19,7 +31,10 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: var(--text-dark);
+      transition: background 0.3s, color 0.3s;
     }
+
     .chat-container {
       width: 100%;
       max-width: 600px;
@@ -27,11 +42,14 @@
       display: flex;
       flex-direction: column;
       background: white;
+      background: var(--bg);
       border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 12px var(--shadow);
       overflow: hidden;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
+
     .chat-header {
       background: var(--primary);
       color: white;
@@ -39,13 +57,32 @@
       font-size: 18px;
       font-weight: 600;
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .toggle-btn:hover {
+      opacity: 0.8;
+    }
+
     .chat-box {
       flex: 1;
       padding: 16px;
       overflow-y: auto;
       background: var(--bg);
+      transition: background 0.3s;
     }
+
     .message {
       margin: 8px 0;
       padding: 10px 14px;
@@ -54,44 +91,53 @@
       line-height: 1.4;
       word-wrap: break-word;
     }
+
     .user {
       background: var(--primary);
       color: white;
       margin-left: auto;
       border-bottom-right-radius: 2px;
     }
+
     .bot {
       background: var(--bot);
       color: var(--text-dark);
       margin-right: auto;
       border-bottom-left-radius: 2px;
     }
+
     .message.bot a:hover {
-  text-decoration: underline;
+      text-decoration: underline;
     }
+
     form {
       display: flex;
       padding: 10px;
-      border-top: 1px solid #ddd;
-      background: white;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      transition: background 0.3s, border-color 0.3s;
     }
-    textarea {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  outline: none;
-  resize: none;
-  min-height: 40px;
-  max-height: 150px;
-  overflow-y: auto;
-  transition: border-color 0.2s;
-}
 
-textarea:focus {
-  border-color: var(--primary);
-}
+    textarea {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      resize: none;
+      min-height: 40px;
+      max-height: 150px;
+      overflow-y: auto;
+      background: var(--bot);
+      color: var(--text-dark);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
     button {
       margin-left: 8px;
       padding: 0 18px;
@@ -103,31 +149,51 @@ textarea:focus {
       font-weight: 500;
       transition: 0.2s background;
     }
+
     button:hover { background: #0056b3; }
+
     .typing { opacity: 0.7; font-style: italic; font-size: 14px; }
+
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">ISO 9001:2015 Chatbot</div>
+    <div class="chat-header">
+      ISO 9001:2015 Chatbot
+      <button class="toggle-btn" id="theme-toggle">🌙</button>
+    </div>
     <div class="chat-box" id="chat-box">
       <div class="message bot">👋 Hi there! Ask me anything about ISO 9001:2015.</div>
     </div>
     <form id="chat-form">
-  <textarea id="user-input" placeholder="Ask your question..." rows="1"></textarea>
-  <button type="submit">Send</button>
-</form>
+      <textarea id="user-input" placeholder="Ask your question..." rows="1"></textarea>
+      <button type="submit">Send</button>
+    </form>
   </div>
 
   <script>
     const form = document.getElementById("chat-form");
     const input = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
+    const themeToggle = document.getElementById("theme-toggle");
 
     // ⚙️ Replace this with your Railway backend URL
     const BACKEND_URL = "https://web-production-86a3c.up.railway.app";
+
+    // 🌓 Theme toggle with localStorage persistence
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+      themeToggle.textContent = "☀️";
+    }
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      themeToggle.textContent = isDark ? "☀️" : "🌙";
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
 
     function appendMessage(text, sender) {
       const msg = document.createElement("div");
@@ -137,20 +203,21 @@ textarea:focus {
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    // Expanding textarea
+    const textarea = document.getElementById("user-input");
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const question = input.value.trim();
       if (!question) return;
 
-      const textarea = document.getElementById("user-input");
-
-textarea.addEventListener("input", () => {
-  textarea.style.height = "auto";
-  textarea.style.height = textarea.scrollHeight + "px";
-});
-      
       appendMessage(question, "user");
       input.value = "";
+      textarea.style.height = "auto";
 
       const typing = document.createElement("div");
       typing.classList.add("message", "bot", "typing");
@@ -159,40 +226,37 @@ textarea.addEventListener("input", () => {
       chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
-  const res = await fetch(`${BACKEND_URL}/ask`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question })
-  });
-  const data = await res.json();
-  typing.remove();
+        const res = await fetch(`${BACKEND_URL}/ask`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+        const data = await res.json();
+        typing.remove();
 
-  // Display answer from backend
-  appendMessage(data.answer || "No answer found in the document.", "bot");
+        appendMessage(data.answer || "No answer found in the document.", "bot");
 
-  // 🧠 Create a "Continue in ChatGPT" link
-  const encodedMessage = encodeURIComponent(
-    `Let's continue this discussion. My last question was: "${question}"\n\nHere's the previous context:\n${data.answer || ''}`
-  );
-  const chatgptLink = `https://chat.openai.com/?q=${encodedMessage}`;
+        const encodedMessage = encodeURIComponent(
+          `Let's continue this discussion. My last question was: "${question}"\n\nHere's the previous context:\n${data.answer || ''}`
+        );
+        const chatgptLink = `https://chat.openai.com/?q=${encodedMessage}`;
 
-  // Add link to chat
-  const linkMsg = document.createElement("div");
-  linkMsg.classList.add("message", "bot");
-  const a = document.createElement("a");
-  a.href = chatgptLink;
-  a.target = "_blank";
-  a.textContent = "Continue this chat in ChatGPT";
-  a.style.color = "#007bff";
-  a.style.textDecoration = "none";
-  a.style.fontWeight = "500";
-  linkMsg.appendChild(a);
-  chatBox.appendChild(linkMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-} catch (err) {
-  typing.remove();
-  appendMessage("⚠️ Error contacting backend.", "bot");
-}
+        const linkMsg = document.createElement("div");
+        linkMsg.classList.add("message", "bot");
+        const a = document.createElement("a");
+        a.href = chatgptLink;
+        a.target = "_blank";
+        a.textContent = "Continue this chat in ChatGPT";
+        a.style.color = "#007bff";
+        a.style.textDecoration = "none";
+        a.style.fontWeight = "500";
+        linkMsg.appendChild(a);
+        chatBox.appendChild(linkMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        typing.remove();
+        appendMessage("⚠️ Error contacting backend.", "bot");
+      }
     });
   </script>
 </body>
