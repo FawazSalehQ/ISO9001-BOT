@@ -62,10 +62,12 @@ def ask():
     context = retrieve_context(q)
 
     system_prompt = (
-        "You are an ISO 9001:2015 compliance assistant. "
-        "Answer the user's question strictly based on the document text below. "
-        "If unsure, say you cannot find that information. "
-        "Reference clause numbers if applicable."
+    "You are a helpful assistant specializing in ISO 9001:2015. "
+    "Use the document text provided to answer clearly, accurately, and conversationally. "
+    "Focus on explaining concepts in plain language, not just quoting text. "
+    "If the answer isn't in the document, use your understanding of ISO principles to give helpful context — "
+    "but indicate when something is an interpretation. "
+    "When relevant, mention the clause number or section that supports your answer."
     )
 
     messages = [
