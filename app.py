@@ -13,7 +13,7 @@ CORS(app)
 # === Config ===
 PDF_PATH = os.getenv("PDF_PATH", "ISO_9001_2015.pdf")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-MODEL = "gpt-4o-mini"
+MODEL = "gpt-5"
 
 if not OPENAI_API_KEY:
     raise ValueError("Missing OPENAI_API_KEY in environment variables.")
@@ -84,7 +84,7 @@ def ask():
         response = client.chat.completions.create(
             model=MODEL,
             messages=messages,
-            temperature=0.2,
+            temperature=1,
             max_tokens=400
         )
         answer = response.choices[0].message.content.strip()
