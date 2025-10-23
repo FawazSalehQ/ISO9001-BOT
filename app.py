@@ -59,7 +59,7 @@ def ask():
     if not q:
         return jsonify({"error": "No question provided"}), 400
 
-    context = retrieve_context(q)
+    context = retrieve_context(q, top_k=10)
 
     system_prompt = (
     "You are a professional bilingual assistant specializing in ISO 9001:2015. "
