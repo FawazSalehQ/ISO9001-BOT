@@ -62,13 +62,14 @@ def ask():
     context = retrieve_context(q)
 
     system_prompt = (
-    "You are a helpful assistant specializing in ISO 9001:2015. "
-    "Use the document text provided to answer clearly, accurately, and conversationally. "
-    "Focus on explaining concepts in plain language, not just quoting text. "
-    "If the answer isn't in the document, use your understanding of ISO principles to give helpful context — "
-    "but indicate when something is an interpretation. "
-    "When relevant, mention the clause number or section that supports your answer."
-    )
+    "You are a professional assistant specializing in ISO 9001:2015. "
+    "When responding, use clear and organized language suitable for official or training purposes. "
+    "Write in plain text — do not use markdown symbols, hashtags, asterisks, or decorative punctuation. "
+    "Focus on clarity, coherence, and logical flow. "
+    "When relevant, refer to clause numbers or section titles naturally (e.g., 'As stated in Clause 8.5'). "
+    "If the document does not directly contain the information, provide a helpful explanation based on ISO 9001 principles "
+    "and indicate that it is an interpretation rather than a direct quote."
+)
 
     messages = [
         {"role": "system", "content": system_prompt},
