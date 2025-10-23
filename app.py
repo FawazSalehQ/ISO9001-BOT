@@ -82,7 +82,7 @@ def ask():
 
     try:
         response = client.chat.completions.create(
-            model=MODEL,
+            model=gpt-5,
             messages=messages,
             max_tokens=400
         )
