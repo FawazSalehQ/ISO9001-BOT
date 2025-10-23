@@ -2,18 +2,16 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 from openai import OpenAI
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
 
 # === Config ===
 PDF_PATH = os.getenv("PDF_PATH", "ISO_9001_2015.pdf")
-EMBED_MODEL = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL = "gpt-4o-mini"
 
@@ -22,7 +20,7 @@ if not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# === Load PDF ===
+# === PDF Loader ===
 def read_pdf_text(path):
     reader = PdfReader(path)
     text = ""
@@ -36,25 +34,21 @@ def chunk_text(text, chunk_size=1200, overlap=200):
         chunks.append(text[i:i + chunk_size].strip())
     return chunks
 
-print("🔹 Loading model & PDF...")
-model = SentenceTransformer(EMBED_MODEL)
+print("🔹 Loading PDF...")
 text = read_pdf_text(PDF_PATH)
 chunks = chunk_text(text)
-print(f"Loaded {len(chunks)} chunks from {PDF_PATH}")
+print(f"✅ Loaded {len(chunks)} chunks from {PDF_PATH}")
 
-embeddings = model.encode(chunks, convert_to_numpy=True, normalize_embeddings=True)
+# === Build TF-IDF Index ===
 vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=2)
 tfidf = vectorizer.fit_transform(chunks)
-print("✅ Index ready.")
+print("✅ TF-IDF index ready.")
 
-# === Helper: retrieve relevant text ===
+# === Retrieval ===
 def retrieve_context(question, top_k=5):
-    qv = model.encode([question], convert_to_numpy=True, normalize_embeddings=True)
-    dense = (embeddings @ qv.T).ravel()
-    qtfidf = vectorizer.transform([question])
-    sparse = cosine_similarity(tfidf, qtfidf).ravel()
-    scores = 0.6 * dense + 0.4 * sparse
-    idx = np.argsort(-scores)[:top_k]
+    q_vec = vectorizer.transform([question])
+    sims = cosine_similarity(tfidf, q_vec).ravel()
+    idx = np.argsort(-sims)[:top_k]
     return "\n\n".join(chunks[i] for i in idx)
 
 # === Endpoint ===
@@ -69,9 +63,9 @@ def ask():
 
     system_prompt = (
         "You are an ISO 9001:2015 compliance assistant. "
-        "Answer the user's question **only** using the document text below. "
+        "Answer the user's question strictly based on the document text below. "
         "If unsure, say you cannot find that information. "
-        "Always keep answers concise and reference relevant clause numbers if present."
+        "Reference clause numbers if applicable."
     )
 
     messages = [
@@ -81,7 +75,7 @@ def ask():
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL,
             messages=messages,
             temperature=0.2,
             max_tokens=400
