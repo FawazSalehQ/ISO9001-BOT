@@ -135,6 +135,13 @@
       const question = input.value.trim();
       if (!question) return;
 
+      const textarea = document.getElementById("user-input");
+
+textarea.addEventListener("input", () => {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+});
+      
       appendMessage(question, "user");
       input.value = "";
 
