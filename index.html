@@ -142,18 +142,40 @@
       chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
-        const res = await fetch(`${BACKEND_URL}/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question })
-        });
-        const data = await res.json();
-        typing.remove();
-        appendMessage(data.answer || "No answer found in the document.", "bot");
-      } catch (err) {
-        typing.remove();
-        appendMessage("⚠️ Error contacting backend.", "bot");
-      }
+  const res = await fetch(`${BACKEND_URL}/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question })
+  });
+  const data = await res.json();
+  typing.remove();
+
+  // Display answer from backend
+  appendMessage(data.answer || "No answer found in the document.", "bot");
+
+  // 🧠 Create a "Continue in ChatGPT" link
+  const encodedMessage = encodeURIComponent(
+    `Let's continue this discussion. My last question was: "${question}"\n\nHere's the previous context:\n${data.answer || ''}`
+  );
+  const chatgptLink = `https://chat.openai.com/?q=${encodedMessage}`;
+
+  // Add link to chat
+  const linkMsg = document.createElement("div");
+  linkMsg.classList.add("message", "bot");
+  const a = document.createElement("a");
+  a.href = chatgptLink;
+  a.target = "_blank";
+  a.textContent = "Continue this chat in ChatGPT";
+  a.style.color = "#007bff";
+  a.style.textDecoration = "none";
+  a.style.fontWeight = "500";
+  linkMsg.appendChild(a);
+  chatBox.appendChild(linkMsg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+} catch (err) {
+  typing.remove();
+  appendMessage("⚠️ Error contacting backend.", "bot");
+}
     });
   </script>
 </body>
