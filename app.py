@@ -13,7 +13,7 @@ CORS(app)
 # === Config ===
 PDF_PATH = os.getenv("PDF_PATH", "ISO_9001_2015.pdf")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-MODEL = "gpt-5"
+MODEL = "gpt-4o-mini"
 
 if not OPENAI_API_KEY:
     raise ValueError("Missing OPENAI_API_KEY in environment variables.")
@@ -59,7 +59,7 @@ def ask():
     if not q:
         return jsonify({"error": "No question provided"}), 400
 
-    context = retrieve_context(q, top_k=10)
+    context = retrieve_context(q)
 
     system_prompt = (
     "You are a professional bilingual assistant specializing in ISO 9001:2015. "
@@ -82,8 +82,9 @@ def ask():
 
     try:
         response = client.chat.completions.create(
-            model=gpt-5,
+            model=gpt-4o-mini,
             messages=messages,
+            temperature=0.2,
             max_tokens=400
         )
         answer = response.choices[0].message.content.strip()
