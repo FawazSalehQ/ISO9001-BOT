@@ -10,17 +10,6 @@
       --bg: #f8f9fa;
       --bot: #e9ecef;
       --text-dark: #212529;
-      --border: #ddd;
-      --shadow: rgba(0,0,0,0.1);
-    }
-
-    body.dark {
-      --primary: #0d6efd;
-      --bg: #121212;
-      --bot: #1f1f1f;
-      --text-dark: #f8f9fa;
-      --border: #333;
-      --shadow: rgba(255,255,255,0.05);
     }
 
     body {
@@ -31,10 +20,33 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      color: var(--text-dark);
-      transition: background 0.3s, color 0.3s;
+      position: relative;
+      overflow: hidden;
     }
 
+    /* === SIDE SLOGANS === */
+    .slogan {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #888;
+      font-weight: 500;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      opacity: 0.7;
+    }
+
+    .slogan.left {
+      left: 20px;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .slogan.right {
+      right: 20px;
+    }
+
+    /* === CHAT CONTAINER === */
     .chat-container {
       width: 100%;
       max-width: 600px;
@@ -42,14 +54,13 @@
       display: flex;
       flex-direction: column;
       background: white;
-      background: var(--bg);
       border-radius: 12px;
-      box-shadow: 0 2px 12px var(--shadow);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
       overflow: hidden;
-      border: 1px solid var(--border);
-      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+      border: 1px solid #ddd;
     }
 
+    /* === HEADER WITH NAME & LINK === */
     .chat-header {
       background: var(--primary);
       color: white;
@@ -62,25 +73,26 @@
       align-items: center;
     }
 
-    .toggle-btn {
-      background: none;
-      border: none;
+    .chat-header .name {
+      font-weight: 600;
+    }
+
+    .chat-header a {
       color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: opacity 0.2s;
+      font-size: 14px;
+      text-decoration: none;
     }
 
-    .toggle-btn:hover {
-      opacity: 0.8;
+    .chat-header a:hover {
+      text-decoration: underline;
     }
 
+    /* === CHAT BOX === */
     .chat-box {
       flex: 1;
       padding: 16px;
       overflow-y: auto;
       background: var(--bg);
-      transition: background 0.3s;
     }
 
     .message {
@@ -112,16 +124,16 @@
 
     form {
       display: flex;
+      align-items: flex-end;
       padding: 10px;
-      border-top: 1px solid var(--border);
-      background: var(--bg);
-      transition: background 0.3s, border-color 0.3s;
+      border-top: 1px solid #ddd;
+      background: white;
     }
 
     textarea {
       flex: 1;
       padding: 12px;
-      border: 1px solid var(--border);
+      border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 15px;
       outline: none;
@@ -129,9 +141,7 @@
       min-height: 40px;
       max-height: 150px;
       overflow-y: auto;
-      background: var(--bot);
-      color: var(--text-dark);
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      transition: border-color 0.2s;
     }
 
     textarea:focus {
@@ -159,10 +169,15 @@
   </style>
 </head>
 <body>
+  <!-- === SIDE TEXTS === -->
+  <div class="slogan left">Together we achieve quality</div>
+  <div class="slogan right">معًا نصنع الجودة</div>
+
+  <!-- === CHAT WINDOW === -->
   <div class="chat-container">
     <div class="chat-header">
-      ISO 9001:2015 Chatbot
-      <button class="toggle-btn" id="theme-toggle">🌙</button>
+      <span class="name">Fawaz</span>
+      <a href="https://linkedin.com/in/YOUR-LINKEDIN-USERNAME" target="_blank">LinkedIn</a>
     </div>
     <div class="chat-box" id="chat-box">
       <div class="message bot">👋 Hi there! Ask me anything about ISO 9001:2015.</div>
@@ -177,23 +192,9 @@
     const form = document.getElementById("chat-form");
     const input = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
-    const themeToggle = document.getElementById("theme-toggle");
 
     // ⚙️ Replace this with your Railway backend URL
     const BACKEND_URL = "https://web-production-86a3c.up.railway.app";
-
-    // 🌓 Theme toggle with localStorage persistence
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-      themeToggle.textContent = "☀️";
-    }
-
-    themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      const isDark = document.body.classList.contains("dark");
-      themeToggle.textContent = isDark ? "☀️" : "🌙";
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    });
 
     function appendMessage(text, sender) {
       const msg = document.createElement("div");
@@ -203,13 +204,6 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Expanding textarea
-    const textarea = document.getElementById("user-input");
-    textarea.addEventListener("input", () => {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    });
-
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const question = input.value.trim();
@@ -217,7 +211,6 @@
 
       appendMessage(question, "user");
       input.value = "";
-      textarea.style.height = "auto";
 
       const typing = document.createElement("div");
       typing.classList.add("message", "bot", "typing");
@@ -233,30 +226,17 @@
         });
         const data = await res.json();
         typing.remove();
-
         appendMessage(data.answer || "No answer found in the document.", "bot");
-
-        const encodedMessage = encodeURIComponent(
-          `Let's continue this discussion. My last question was: "${question}"\n\nHere's the previous context:\n${data.answer || ''}`
-        );
-        const chatgptLink = `https://chat.openai.com/?q=${encodedMessage}`;
-
-        const linkMsg = document.createElement("div");
-        linkMsg.classList.add("message", "bot");
-        const a = document.createElement("a");
-        a.href = chatgptLink;
-        a.target = "_blank";
-        a.textContent = "Continue this chat in ChatGPT";
-        a.style.color = "#007bff";
-        a.style.textDecoration = "none";
-        a.style.fontWeight = "500";
-        linkMsg.appendChild(a);
-        chatBox.appendChild(linkMsg);
-        chatBox.scrollTop = chatBox.scrollHeight;
       } catch (err) {
         typing.remove();
         appendMessage("⚠️ Error contacting backend.", "bot");
       }
+    });
+
+    // Auto-expand textarea
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      input.style.height = input.scrollHeight + "px";
     });
   </script>
 </body>
