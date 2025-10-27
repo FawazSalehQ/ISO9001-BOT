@@ -12,6 +12,7 @@
       --text-dark: #212529;
       --header-bg: var(--primary);
       --header-text: white;
+      --slogan-color: rgba(136, 136, 136, 0.3);
     }
 
     body.dark {
@@ -21,6 +22,7 @@
       --text-dark: #f1f1f1;
       --header-bg: #111;
       --header-text: #f8f9fa;
+      --slogan-color: rgba(255, 255, 255, 0.15);
     }
 
     body {
@@ -32,7 +34,32 @@
       align-items: center;
       height: 100vh;
       position: relative;
+      overflow: hidden;
       transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* === SIDE SLOGANS (background-level) === */
+    .slogan {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--slogan-color);
+      pointer-events: none;
+      user-select: none;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transition: color 0.3s ease;
+    }
+
+    .slogan.left {
+      left: 40px;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .slogan.right {
+      right: 40px;
     }
 
     /* === CHAT CONTAINER === */
@@ -42,7 +69,6 @@
       height: 80vh;
       display: flex;
       flex-direction: column;
-      background: white;
       background: var(--bg);
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
@@ -50,6 +76,7 @@
       border: 1px solid #ddd;
       position: relative;
       transition: background 0.3s ease, border-color 0.3s ease;
+      z-index: 2;
     }
 
     /* === HEADER === */
@@ -139,7 +166,6 @@
       align-items: flex-end;
       padding: 10px;
       border-top: 1px solid #ddd;
-      background: white;
       background: var(--bg);
       transition: background 0.3s ease;
     }
@@ -182,24 +208,14 @@
 
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-
-    /* === BOTTOM SLOGANS === */
-    .slogan-bar {
-      position: absolute;
-      bottom: 8px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 20px;
-      font-size: 15px;
-      color: #888;
-      font-weight: 500;
-      opacity: 0.8;
-    }
   </style>
 </head>
 <body>
-  <!-- === CHAT WINDOW === -->
+  <!-- === SIDE BACKGROUND SLOGANS === -->
+  <div class="slogan left">Together we achieve quality</div>
+  <div class="slogan right">معًا نصنع الجودة</div>
+
+  <!-- === CHAT PANEL === -->
   <div class="chat-container">
     <div class="chat-header">
       <span class="title">ISO 9001:2015 Assistant</span>
@@ -218,12 +234,6 @@
       <textarea id="user-input" placeholder="Ask your question..." rows="1"></textarea>
       <button type="submit">Send</button>
     </form>
-
-    <!-- === SLOGANS === -->
-    <div class="slogan-bar">
-      <span>Together we achieve quality</span>
-      <span>معًا نصنع الجودة</span>
-    </div>
   </div>
 
   <script>
