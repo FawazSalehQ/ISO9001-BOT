@@ -21,29 +21,6 @@
       align-items: center;
       height: 100vh;
       position: relative;
-      overflow: hidden;
-    }
-
-    /* === SIDE SLOGANS === */
-    .slogan {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      color: #888;
-      font-weight: 500;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      opacity: 0.7;
-    }
-
-    .slogan.left {
-      left: 20px;
-      transform: translateY(-50%) rotate(180deg);
-    }
-
-    .slogan.right {
-      right: 20px;
     }
 
     /* === CHAT CONTAINER === */
@@ -58,29 +35,36 @@
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
       overflow: hidden;
       border: 1px solid #ddd;
+      position: relative;
     }
 
-    /* === HEADER WITH NAME & LINK === */
+    /* === HEADER === */
     .chat-header {
       background: var(--primary);
       color: white;
       padding: 12px 18px;
       font-size: 18px;
       font-weight: 600;
-      text-align: center;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .chat-header .name {
+    .chat-header .title {
       font-weight: 600;
+    }
+
+    .chat-header .author {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .chat-header a {
       color: white;
-      font-size: 14px;
       text-decoration: none;
+      font-size: 14px;
     }
 
     .chat-header a:hover {
@@ -116,10 +100,6 @@
       color: var(--text-dark);
       margin-right: auto;
       border-bottom-left-radius: 2px;
-    }
-
-    .message.bot a:hover {
-      text-decoration: underline;
     }
 
     form {
@@ -166,26 +146,47 @@
 
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+    /* === BOTTOM SLOGANS === */
+    .slogan-bar {
+      position: absolute;
+      bottom: 8px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 15px;
+      color: #888;
+      font-weight: 500;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
-  <!-- === SIDE TEXTS === -->
-  <div class="slogan left">Together we achieve quality</div>
-  <div class="slogan right">معًا نصنع الجودة</div>
-
   <!-- === CHAT WINDOW === -->
   <div class="chat-container">
     <div class="chat-header">
-      <span class="name">Fawaz</span>
-      <a href="https://linkedin.com/in/YOUR-LINKEDIN-USERNAME" target="_blank">LinkedIn</a>
+      <span class="title">ISO 9001:2015 Assistant</span>
+      <span class="author">
+        Fawaz Aljathnan · 
+        <a href="https://www.linkedin.com/in/fawazsalehq" target="_blank">LinkedIn</a>
+      </span>
     </div>
+
     <div class="chat-box" id="chat-box">
       <div class="message bot">👋 Hi there! Ask me anything about ISO 9001:2015.</div>
     </div>
+
     <form id="chat-form">
       <textarea id="user-input" placeholder="Ask your question..." rows="1"></textarea>
       <button type="submit">Send</button>
     </form>
+
+    <!-- === SLOGANS === -->
+    <div class="slogan-bar">
+      <span>Together we achieve quality</span>
+      <span>معًا نصنع الجودة</span>
+    </div>
   </div>
 
   <script>
@@ -193,7 +194,7 @@
     const input = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
 
-    // ⚙️ Replace this with your Railway backend URL
+    // ⚙️ Replace with your backend URL
     const BACKEND_URL = "https://web-production-86a3c.up.railway.app";
 
     function appendMessage(text, sender) {
